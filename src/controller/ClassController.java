@@ -1,42 +1,62 @@
 package controller;
+
 import java.util.concurrent.Semaphore;
 
-
-public class ClassController extends Thread{
+// trabalho mais curto primeiro 
+public class ClassController extends Thread {
+	Semaphore semaforo;
 	private int ThreadId;
-	private Semaphore semaforo;
-
+	int vet[] = new int[20];
 	public ClassController(int ThreadId, Semaphore semaforo) {
 		this.ThreadId = ThreadId;
 		this.semaforo = semaforo;
 	}
+
 	public void run() {
-		processoSJF();
+		escalonamento();
+		mostrar();
 	}
-	
-	public void processoSJF(){
+
+	public void escalonamento() {
 		int cta = 0;
-		while(cta < 1) {
-			cta +=1;
-			System.out.println("A thread #" + ThreadId + " chegou.");
+		int tempo = 0;
+		while (cta < 1) {
+			 tempo = (int) ((Math.random() * 117) + 4);
+			System.out.println("A ThreadId #" + ThreadId + " demorou " + tempo + "s para chegar.");
+			cta++;
 			try {
-				semaforo.acquire();
-				saida();
+				sleep(tempo);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-			} finally {
-				semaforo.release();
 			}
 		}
+		saida(tempo);
 	}
-	private void saida() {
-		int duracao = (int) ((Math.random()*4.1)+ 116);
-		try {
-			sleep(duracao);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+
+	private void saida(int tempo) {
+		int aux = 0;
+
+		for (int i = 0; i < 20; i++) {
+			vet[i] = tempo;
+			
 		}
-		
-		System.out.println("A thread #" + ThreadId + " saiu.");
+
+		for (int i = 0; i < 20; i++) {
+			for (int j = i + 1; j < 20; j++) {
+				if (vet[j] < vet[i]) {
+					aux = vet[j];
+					vet[j] = vet[i];
+					vet[i] = aux;
+				}
+			}
+		}
+
+	}
+
+	private void mostrar() {
+	
+	for(int i = 0; i < 1; i++) {
+		System.out.println( "#" + ThreadId + " saiu com o tempo de: "+vet[i] + "s");
+	}
 	}
 }
